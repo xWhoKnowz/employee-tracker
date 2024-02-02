@@ -81,37 +81,51 @@ inquirer
     }
     else if (userSelection.userChoice === `Add Role`) {
 
-      inquirer
-        .prompt([
-          {
-            type: `input`,
-            message: `What is the name of the role?`,
-            name: `newRole`,
-          },
-          {
-            type: `input`,
-            message: `What is the salary of the role?`,
-            name: `roleSalary`,
-          },
-          {
-            type: `list`,
-            message: `Which department does the role belong too?`,
-            name: `roleDepartment`,
-            choices: [`Sales`, `Engineering`, `Finance`, `Legal`]
-          }
-        ])
-        .then((response) => {
-
-          db.query(`INSERT INTO role (title, department_id, salary) VALUES ('${response.newDepartment}')`, (err, results) => {
-            if (err) {
-              console.log(err);
-            }
-            else {
-              console.log('Role Added Successfully');
-            }
+      db.query(`SELECT * FROM department ORDER BY department.department_name`, (err, results) => {
+        if (err) {
+          console.log(err);
+        }
+        else {
+          const roleReverse = results.map((role) => {
+            return {
+              name: role.department_name,
+              value: role.id
+            };
           })
-        })
 
+          inquirer
+            .prompt([
+              {
+                type: `input`,
+                message: `What is the name of the role?`,
+                name: `newRole`,
+              },
+              {
+                type: `input`,
+                message: `What is the salary of the role?`,
+                name: `roleSalary`,
+              },
+              {
+                type: `list`,
+                message: `Which department does the role belong too?`,
+                name: `roleDepartment`,
+                choices: roleReverse
+              }
+            ])
+            .then((response) => {
+
+              db.query(`INSERT INTO role (title, department_id, salary) 
+                    VALUES (?, ?, ?)`, [response.newRole, response.roleDepartment, response.roleSalary], (err, results) => {
+                if (err) {
+                  console.log(err);
+                }
+                else {
+                  console.log('Role Added Successfully');
+                };
+              })
+            })
+        };
+      })
     }
     else if (userSelection.userChoice === `View All Employees`) {
       db.query(`SELECT employee.id, employee.first_name, employee.last_name, title, department_name AS department, salary, manager.first_name AS "Manager First Name", manager.last_name AS "Manager Last Name"

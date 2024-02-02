@@ -14,9 +14,9 @@
 -- FROM role 
 -- JOIN department ON role.department_id = department.id;
 
--- * Add Role
-    INSERT INTO role (title, department_id, salary) 
-    VALUES ('${response.newDepartment}')
+-- -- * Add Role
+-- INSERT INTO role (title, department_id, salary) 
+-- VALUES ('test role', 2, 500000)
 
 -- * View Emp
 -- SELECT employee.id, employee.first_name, employee.last_name, title, department_name AS department, salary, manager.first_name AS "Manager First Name", manager.last_name AS "Manager Last Name"
