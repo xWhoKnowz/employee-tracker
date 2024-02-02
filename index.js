@@ -143,8 +143,82 @@ inquirer
     }
     else if (userSelection.userChoice === `Add Employee`) {
 
+      db.query(`SELECT first_name, last_name, employee.id 
+                FROM employee`, (err, results) => {
+        if (err) {
+          console.log(err);
+        }
+        else {
+          db.query(`SELECT role.title, role.id
+                    FROM role`, (err, roleResults) => {
+            if (err) {
+              console.log(err);
+            }
+            else {
+              const availRoles = roleResults.map((role) => {
+                console.log(role);
+                return {
+                  name: role.title,
+                  value: role.id
+                };
+              })
+              const roleManager = results.map((emp) => {
+                console.log(emp);
+                return {
+                  name: `${emp.first_name}, ${emp.last_name}`,
+                  value: emp.id
+                };
+              })
+
+              roleManager.push({name: 'None', value: null})
+
+              inquirer
+                .prompt([
+                  {
+                    type: `input`,
+                    message: `What is employee's first name?`,
+                    name: `firstName`,
+                  },
+                  {
+                    type: `input`,
+                    message: `What is employee's last name?`,
+                    name: `lastName`,
+                  },
+                  {
+                    type: `list`,
+                    message: `What is the employee's role?`,
+                    name: `empRole`,
+                    choices: availRoles
+                  },
+                  {
+                    type: `list`,
+                    message: `Who is the employee's manager?`,
+                    name: `empMan`,
+                    choices: roleManager
+                  },
+                ])
+                .then((res) => {
+
+                  db.query(`INSERT INTO employee (first_name, last_name, role_id, manager_id) 
+                                  VALUES (?, ?, ?, ?)`, [res.firstName, res.lastName, res.empRole, res.empMan], (err, results) => {
+                    if (err) {
+                      console.log(err);
+                    }
+                    else {
+                      console.log('Role Added Successfully');
+                    };
+                  })
+                })
+            }
+          })
+
+        };
+      })
+
     }
     else if (userSelection.userChoice === `Update Employee Role`) {
+
+      
 
     }
     else if (userSelection.userChoice === `Quit`) {
